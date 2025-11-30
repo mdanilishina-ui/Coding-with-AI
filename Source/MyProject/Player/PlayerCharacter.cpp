@@ -1,10 +1,9 @@
 #include "PlayerCharacter.h"
-
 #include "Camera/CameraComponent.h"
-#include "Components/InputComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/InputComponent.h"
+#include "Engine/Engine.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -46,29 +45,21 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::MoveForward(float Value)
 {
-    if (Controller && !FMath::IsNearlyZero(Value))
+    if (Value != 0.f)
     {
-        const FRotator ControlRot = Controller->GetControlRotation();
-        const FRotator YawRot(0.f, ControlRot.Yaw, 0.f);
-
-        const FVector Direction = FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
-        AddMovementInput(Direction, Value);
+        AddMovementInput(GetActorForwardVector(), Value);
     }
 }
 
 void APlayerCharacter::MoveRight(float Value)
 {
-    if (Controller && !FMath::IsNearlyZero(Value))
+    if (Value != 0.f)
     {
-        const FRotator ControlRot = Controller->GetControlRotation();
-        const FRotator YawRot(0.f, ControlRot.Yaw, 0.f);
-
-        const FVector Direction = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
-        AddMovementInput(Direction, Value);
+        AddMovementInput(GetActorRightVector(), Value);
     }
 }
 
 void APlayerCharacter::HandleTestLog()
 {
-    UE_LOG(LogTemp, Log, TEXT("TestLog input received on %s"), *GetName());
+    UE_LOG(LogTemp, Warning, TEXT("TestAction triggered!"));
 }

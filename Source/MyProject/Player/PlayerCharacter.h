@@ -4,15 +4,8 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
-
-/**
- * Basic player character for collection prototype.
- * Handles movement input and a temporary TestLog action for verification.
- */
 UCLASS()
-class MYPROJECT_API APlayerCharacter : public ACharacter
+class YOURPROJECT_API APlayerCharacter : public ACharacter
 {
     GENERATED_BODY()
 
@@ -20,16 +13,15 @@ public:
     APlayerCharacter();
 
 protected:
-    virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
-private:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-    USpringArmComponent* CameraBoom;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-    UCameraComponent* FollowCamera;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     void MoveForward(float Value);
     void MoveRight(float Value);
     void HandleTestLog();
+
+    UPROPERTY(VisibleAnywhere)
+    class USpringArmComponent* CameraBoom;
+
+    UPROPERTY(VisibleAnywhere)
+    class UCameraComponent* FollowCamera;
 };
