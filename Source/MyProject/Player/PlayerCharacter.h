@@ -1,19 +1,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ThirdPersonCharacter.h"
+#include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
-/**
- * Backward-compatible player pawn that preserves the original PlayerCharacter naming
- * while reusing the updated ThirdPerson template-aligned setup.
- */
 UCLASS()
-class MYPROJECT_API APlayerCharacter : public AThirdPersonCharacter
+class YOURPROJECT_API APlayerCharacter : public ACharacter
 {
     GENERATED_BODY()
 
 public:
     APlayerCharacter();
-};
 
+protected:
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+    void MoveForward(float Value);
+    void MoveRight(float Value);
+    void HandleTestLog();
+
+    UPROPERTY(VisibleAnywhere)
+    class USpringArmComponent* CameraBoom;
+
+    UPROPERTY(VisibleAnywhere)
+    class UCameraComponent* FollowCamera;
+};
