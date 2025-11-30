@@ -1,14 +1,17 @@
-# Player Collect Mechanic — Step 1: Create `AThirdPersonCharacter`
+# Player Collect Mechanic — Step 1: Create `AThirdPersonCharacter` (with `APlayerCharacter` alias)
 
 ## Files Created
 - `Source/MyProject/Player/ThirdPersonCharacter.h`
 - `Source/MyProject/Player/ThirdPersonCharacter.cpp`
+- `Source/MyProject/Player/PlayerCharacter.h`
+- `Source/MyProject/Player/PlayerCharacter.cpp`
 
 > Replace `MyProject` with your module name if it differs. Keep the folder path consistent inside the module (e.g., `Source/MyProject/Player/`).
 
 ## Architecture Rationale
 - **Owner**: The player-controlled pawn should be an `ACharacter` to leverage the Character Movement Component for built-in walking, jumping, and navigation support.
 - **Responsibility**: This class owns input bindings (jump, movement, and a temporary TestLog action) and basic logging to prove the pawn and input are wired correctly in C++ only (no Blueprint dependency).
+- **Compatibility**: `APlayerCharacter` subclasses `AThirdPersonCharacter` to keep the original class name available for branches that still reference it, reducing merge conflicts while preserving the new template-aligned setup.
 - **Dependency**: Uses `UCharacterMovementComponent` already on `ACharacter`; no extra components required for this step.
 
 ## C++ Code
@@ -126,13 +129,40 @@ void AThirdPersonCharacter::HandleTestLog()
 }
 ```
 
+### `PlayerCharacter.h/.cpp` (compatibility wrapper)
+```cpp
+#pragma once
+
+#include "CoreMinimal.h"
+#include "ThirdPersonCharacter.h"
+#include "PlayerCharacter.generated.h"
+
+UCLASS()
+class MYPROJECT_API APlayerCharacter : public AThirdPersonCharacter
+{
+    GENERATED_BODY()
+
+public:
+    APlayerCharacter();
+};
+```
+
+```cpp
+#include "PlayerCharacter.h"
+
+APlayerCharacter::APlayerCharacter()
+{
+    // Inherit default ThirdPerson template-style setup from AThirdPersonCharacter.
+}
+```
+
 ## Editor Setup (UE5)
 1. Add the new class files to your module, then compile.
 2. In Project Settings → Input:
    - **Action**: `Jump` mapped to Spacebar (default) and `TestLog` mapped to a convenient key (e.g., `T`).
    - **Axis**: `MoveForward` (W/S or Up/Down, Scale 1/-1), `MoveRight` (A/D or Left/Right, Scale -1/1).
-3. If you are working from the basic ThirdPerson template assets, create or reuse `BP_ThirdPersonCharacter` (or your existing starter blueprint) derived from `AThirdPersonCharacter` so its mesh/anim blueprint stay intact.
-4. Set `AThirdPersonCharacter` (or your `BP_ThirdPersonCharacter`) as the default pawn class in your GameMode and place the pawn in the level if needed.
+3. If you are working from the basic ThirdPerson template assets, create or reuse `BP_ThirdPersonCharacter` (or your existing starter blueprint) derived from `AThirdPersonCharacter` so its mesh/anim blueprint stay intact. Projects that still reference `BP_PlayerCharacter` can keep that blueprint by switching its parent to `APlayerCharacter` to avoid merge conflicts.
+4. Set `AThirdPersonCharacter` (or your `BP_ThirdPersonCharacter`) as the default pawn class in your GameMode and place the pawn in the level if needed. Teams that still need the legacy name can set `APlayerCharacter`/`BP_PlayerCharacter` instead; both share the same behavior.
 
 ## Tests
 - Play In Editor, move with configured keys; character should walk using Character Movement.
