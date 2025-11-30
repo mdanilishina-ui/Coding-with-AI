@@ -151,8 +151,10 @@ public:
 #include "PlayerCharacter.h"
 
 APlayerCharacter::APlayerCharacter()
+    : Super()
 {
-    // Inherit default ThirdPerson template-style setup from AThirdPersonCharacter.
+    // Intentionally relies on AThirdPersonCharacter defaults to match the ThirdPerson template
+    // while keeping the legacy class name available.
 }
 ```
 
