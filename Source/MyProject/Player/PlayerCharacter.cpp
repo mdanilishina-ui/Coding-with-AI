@@ -10,20 +10,26 @@ APlayerCharacter::APlayerCharacter()
 {
     PrimaryActorTick.bCanEverTick = false;
 
+    bUseControllerRotationPitch = false;
+    bUseControllerRotationYaw = false;
+    bUseControllerRotationRoll = false;
+
     UCharacterMovementComponent* MoveComp = GetCharacterMovement();
     if (MoveComp)
     {
+        MoveComp->bOrientRotationToMovement = true;
+        MoveComp->RotationRate = FRotator(0.f, 500.f, 0.f);
         MoveComp->MaxWalkSpeed = 600.f;
         MoveComp->BrakingDecelerationWalking = 2048.f;
     }
 
-    USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-    SpringArm->SetupAttachment(RootComponent);
-    SpringArm->TargetArmLength = 300.f;
-    SpringArm->bUsePawnControlRotation = true;
+    CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+    CameraBoom->SetupAttachment(RootComponent);
+    CameraBoom->TargetArmLength = 300.f;
+    CameraBoom->bUsePawnControlRotation = true;
 
-    UCameraComponent* FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-    FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+    FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+    FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     FollowCamera->bUsePawnControlRotation = false;
 }
 
