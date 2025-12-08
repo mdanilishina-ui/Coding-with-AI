@@ -19,3 +19,17 @@ This repository contains a UE5.6 Python scaffolding script that builds the C++ f
    - Add a `ProgressShaderManager` actor, assign your environment material to **BaseMaterial**, and set **PlayerActor**/**TargetActor** references.
 
 Running the script repeatedly is safe; it overwrites the generated files so you can iterate on the C++ implementations as needed.
+
+## How to test the first three collect-mechanic steps
+1. **Run the setup script inside your UE5 project** following the steps above, then build the project so the generated C++ classes compile.
+2. **Set AgentKai as the default pawn** in your GameMode.
+3. **Bind inputs in Project Settings → Input**
+   - Ensure the Third Person template axis mappings remain for `MoveForward`/`MoveRight`.
+   - Add action mappings: `TestLog` (bind to a convenient key like `T`) and `Grab` (e.g., `E`).
+4. **Place test actors in the level**
+   - Drop a few `CollectibleItem` actors near the player start; assign a Static Mesh so they are visible.
+   - Make sure AgentKai starts close enough to reach them.
+5. **Step tests in PIE**
+   - Press your `TestLog` key to confirm the character and inputs are wired; the Output Log should show `TestLog action pressed — input mapping confirmed.`
+   - Look at the placed collectible to confirm it appears in the level (verifies the mesh-only pickup actor).
+   - Stand within a couple meters of a collectible, aim at it, and press `Grab`; the Output Log should print `Grab trace hit: <ActorName>`, proving the sphere trace detects items.
