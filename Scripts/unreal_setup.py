@@ -119,9 +119,9 @@ class CodingWithAiSetup:
 
                 void MoveForward(float Value);
                 void MoveRight(float Value);
+                void TestLogAction();
                 void StartGrab();
                 void TryCollectItem();
-                void AttachCollectedItem(ACollectibleItem* Item);
 
                 UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
                 USpringArmComponent* CameraBoom;
@@ -135,14 +135,6 @@ class CodingWithAiSetup:
                 UPROPERTY(EditDefaultsOnly, Category = "Collecting")
                 float GrabRadius;
 
-                UPROPERTY(EditDefaultsOnly, Category = "Collecting")
-                FName BackSocketBaseName;
-
-                UPROPERTY(EditDefaultsOnly, Category = "Collecting")
-                float BackSocketSpacing;
-
-                UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collecting")
-                TArray<ACollectibleItem*> CollectedItems;
             }};
         '''
 
@@ -170,8 +162,6 @@ class CodingWithAiSetup:
 
                 GrabDistance = 250.0f;
                 GrabRadius = 60.0f;
-                BackSocketBaseName = TEXT("BackSocket");
-                BackSocketSpacing = 8.0f;
             }}
 
             void AAgentKaiCharacter::BeginPlay()
@@ -194,6 +184,7 @@ class CodingWithAiSetup:
                 PlayerInputComponent->BindAxis("MoveRight", this, &AAgentKaiCharacter::MoveRight);
                 PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
                 PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+                PlayerInputComponent->BindAction("TestLog", IE_Pressed, this, &AAgentKaiCharacter::TestLogAction);
                 PlayerInputComponent->BindAction("Grab", IE_Pressed, this, &AAgentKaiCharacter::StartGrab);
             }}
 
@@ -221,6 +212,11 @@ class CodingWithAiSetup:
                 }}
             }}
 
+            void AAgentKaiCharacter::TestLogAction()
+            {{
+                UE_LOG(LogTemp, Log, TEXT("TestLog action pressed — input mapping confirmed."));
+            }}
+
             void AAgentKaiCharacter::StartGrab()
             {{
                 TryCollectItem();
@@ -246,11 +242,7 @@ class CodingWithAiSetup:
 
                 if (bHit)
                 {{
-                    if (ACollectibleItem* Item = Cast<ACollectibleItem>(HitResult.GetActor()))
-                    {{
-                        UE_LOG(LogTemp, Log, TEXT("Collected %s"), *Item->GetName());
-                        AttachCollectedItem(Item);
-                    }}
+                    UE_LOG(LogTemp, Log, TEXT("Grab trace hit: %s"), *GetNameSafe(HitResult.GetActor()));
                 }}
                 else
                 {{
@@ -258,25 +250,6 @@ class CodingWithAiSetup:
                 }}
             }}
 
-            void AAgentKaiCharacter::AttachCollectedItem(ACollectibleItem* Item)
-            {{
-                if (!Item)
-                {{
-                    return;
-                }}
-
-                CollectedItems.Add(Item);
-                Item->OnCollected();
-
-                const int32 Index = CollectedItems.Num() - 1;
-                const FName SocketName = FName(*FString::Printf(TEXT("%s_%d"), *BackSocketBaseName.ToString(), Index));
-
-                FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
-                Item->AttachToComponent(GetMesh(), AttachRules, SocketName);
-
-                const FVector Offset(0.f, 0.f, -BackSocketSpacing * Index);
-                Item->AddActorLocalOffset(Offset);
-            }}
         '''
 
         self._write_file(Path("Public/Characters/AgentKaiCharacter.h"), header)
